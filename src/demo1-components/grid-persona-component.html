@@ -1,0 +1,106 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/vaadin-valo-theme/vaadin-grid.html">
+<link rel="import" href="../../bower_components/vaadin-grid/vaadin-grid.html">
+<link rel="import" href="../../bower_components/vaadin-grid/vaadin-grid-sorter.html">
+<link rel="import" href="../../bower_components/vaadin-grid/vaadin-grid-column.html">
+<link rel="import" href="../../bower_components/vaadin-grid/vaadin-grid-selection-column.html">
+<link rel="import" href="../../bower_components/vaadin-grid/vaadin-grid-selection-column.html">
+<link rel="import" href="../demo1-styles/main-styles.html">
+<script src = "../../bower_components/moment/moment.js"></script>
+
+<link rel="import" href="../demo1-provider/persona-provider.html">
+                  
+<dom-module id="grid-persona-component">
+  <template>
+
+    <!-- styles -->
+    <style include = "main-styles" ></style>
+
+    <!-- Provides -->
+    <persona-provider id = "personaProvider" ></persona-provider> 
+
+ 
+    <vaadin-grid id="grid" theme="row-dividers" items="[[personas.data]]" active-item="{{activeItem}}" column-reordering-allowed multi-sort>
+      <vaadin-grid-column width = "300px">
+        <template class="header">
+          <vaadin-grid-sorter path="nombres">Nombre</vaadin-grid-sorter>
+        </template>
+        <template>[[item.nombres]] [[item.apellidos]]</template>
+      </vaadin-grid-column>
+      <vaadin-grid-column width = "200px" >
+        <template class="header">
+          <vaadin-grid-sorter path="num_documento">Documento</vaadin-grid-sorter>
+        </template>
+        <template>[[item.num_documento_nombre]] : [[item.num_documento]]</template>
+      </vaadin-grid-column>
+      <vaadin-grid-column width = "250px">
+        <template class="header">
+          <vaadin-grid-sorter path="email">Email</vaadin-grid-sorter>
+        </template>
+        <template>[[item.email]]</template>
+      </vaadin-grid-column>
+      <vaadin-grid-column width = "150px">
+        <template class="header">
+          <vaadin-grid-sorter path="telefono">Telefono</vaadin-grid-sorter>
+        </template>
+        <template>[[item.telefono]]</template>
+      </vaadin-grid-column>
+      <vaadin-grid-column width = "200px">
+        <template class="header">
+          <vaadin-grid-sorter path="fec_nacimiento">Fec. Nacimiento</vaadin-grid-sorter>
+        </template>
+        <template>[[renderFechaNacimiento(item.fec_nacimiento)]]</template>
+      </vaadin-grid-column>
+    </vaadin-grid>
+  </template>
+
+  <script>
+
+    class GridPersonaComponent extends Polymer.Element {
+      static get is() { return 'grid-persona-component'; }
+      static get properties() {
+        return {
+          formatFecNacimiento: {
+            type: String,
+            value: '',
+            notify:true
+          },
+          actionTitlePersona: {
+            type: String,
+            notify:true,
+          },
+          activeItem: {
+            type:Object,
+            notify:true
+          },
+          personas:{
+            type:Object,
+            notify:true
+          }
+        };
+      }
+
+      connectedCallback (){
+          super.connectedCallback();
+          this.listarPersonas();
+      }
+
+      listarPersonas(){
+         let request = this.$.personaProvider.listarPersonasDoRequest();
+          request.then((xhr) => {
+                 this.personas = xhr.response;
+          });
+      }
+
+      renderFechaNacimiento(fecNacimiento){
+        if(fecNacimiento){
+          return   moment(fecNacimiento).format("DD/MM/YYYY");
+        }
+      }
+
+    }
+
+    window.customElements.define(GridPersonaComponent.is, GridPersonaComponent);
+  </script>
+
+</dom-module>
